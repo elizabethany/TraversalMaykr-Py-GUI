@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TraversalMaykr-Py-GUI", "TraversalMaykr-Py-GUI\TraversalMaykr-Py-GUI.pyproj", "{7610B72C-EF75-425A-A647-DD5BECF5180F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7610B72C-EF75-425A-A647-DD5BECF5180F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7610B72C-EF75-425A-A647-DD5BECF5180F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C7FEEB7-56B0-4229-B15A-656A1DFF4349}
+	EndGlobalSection
+EndGlobal

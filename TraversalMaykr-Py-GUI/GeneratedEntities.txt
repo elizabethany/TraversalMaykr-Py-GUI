@@ -1,0 +1,51 @@
+
+entity {
+	entityDef mod_info_traversal_archvile_00982 {
+	class = "idInfoTraversal";
+	expandInheritance = false;
+	poolCount = 0;
+	poolGranularity = 2;
+	networkReplicated = false;
+	disableAIPooling = false;
+	edit = {
+		traversalAnim = "animweb/characters/monsters/archvile/traversal/rail_up_700";
+		monsterType = "TRAVERSALMONSTERTYPE_ARCHVILE";
+		snapToGround = true;
+		spawnPosition = {
+			x = 10.0;
+			y = 10.0;
+			z = 8.342649999999999;
+		}
+		traversalEndpoint = {
+			x = 10.0;
+			y = 13.0;
+			z = 25.0;
+		}
+	}
+}
+}
+entity {
+	entityDef mod_info_traversal_archvile_00982_r {
+	class = "idInfoTraversal";
+	expandInheritance = false;
+	poolCount = 0;
+	poolGranularity = 2;
+	networkReplicated = false;
+	disableAIPooling = false;
+	edit = {
+		traversalAnim = "animweb/characters/monsters/archvile/traversal/rail_down_700";
+		monsterType = "TRAVERSALMONSTERTYPE_ARCHVILE";
+		snapToGround = true;
+		spawnPosition = {
+			x = 20.0;
+			y = 23.0;
+			z = 33.34265;
+		}
+		traversalEndpoint = {
+			x = -10.0;
+			y = -13.0;
+			z = -25.0;
+		}
+	}
+}
+}
