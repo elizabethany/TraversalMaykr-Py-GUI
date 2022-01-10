@@ -1,7 +1,0 @@
-marauder_wolf
-TRAVERSALMONSTERTYPE_MARAUDER_WOLF
-animweb/characters/monsters/marauder_wolf/traversals/
-jump_forward_500
-leap_500_forward
-ledge_down_500
-ledge_up_500
