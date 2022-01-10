@@ -121,15 +121,13 @@ DEAnimDictionary = {
     5: animationSet5
 }
 
-# DE idInfoTraversal
-def generateDEInfoTraversal(
+# DE: get info needed for idInfoTraversal, then pass it on to be generated
+def getInputDEInfoTraversal(
     ):
         
     entityNum = int(input("\nSet entity numbering start value: ")); # Set number to append at end of entity name
 
     while True:
-        entityNumStr = str(entityNum).zfill(5) # Leading zeros padding
-        
         # Get start and end coords
         startCoords = list(map(float, input("Starting coords: ").split()));
         endCoords = list(map(float, input("Destination coords: ").split()));
@@ -138,75 +136,88 @@ def generateDEInfoTraversal(
         animIndex = int(input("Animation type: "))
         reciprocalTraversal = input("Generate reciprocal traversal? (Y/N): ")
 
-        for i in range (0 , len(monsterIndices)):
-            monsterIndex = monsterIndices[i]
-
-            # Determine which animation set to use, based on the monster type
-            if monsterIndex == 14: # arachnotron
-                animSetIndex = 3
-            elif monsterIndex == 15: # wolf
-                animSetIndex = 4
-            elif monsterIndex == 16: # zombie
-                animSetIndex = 5
-            elif monsterIndex >= 17 and monsterIndex <= 22: # baron, hell knight, imp, mancubus, pinky, soldier
-                animSetIndex = 2
-            else: # everything else
-                animSetIndex = 1
-
-            startCoords[2] -= DEpmNormalViewHeight
-            endCoords[2] -= DEpmNormalViewHeight
-            animation = DEAnimDictionary[animSetIndex][animIndex - 1]
-            monsterName = DEMonsterNameDictionary[monsterIndex]
-            monsterPath = DEMonsterPathDictionary[monsterIndex]
-            monsterType = DEMonsterTypeDictionary[monsterIndex]
-                
-            # args to pass into the template
-            args = {
-                'entityNum': entityNumStr,
-                'startX': startCoords[0],
-                'startY': startCoords[1],
-                'startZ': startCoords[2],
-                'endX': endCoords[0] - startCoords[0],
-                'endY': endCoords[1] - startCoords[1],
-                'endZ': endCoords[2] - startCoords[2],
-                'monsterName' : monsterName,
-                'monsterPath' : monsterPath,
-                'animation' : animation,
-                'monsterType' : monsterType
-            }
-            reciprocalArgs = {
-                'entityNum': entityNumStr + "_r",
-                'startX': endCoords[0],
-                'startY': endCoords[1],
-                'startZ': endCoords[2],
-                'endX': startCoords[0] - endCoords[0],
-                'endY': startCoords[1] - endCoords[1],
-                'endZ': startCoords[2] - endCoords[2],
-                'monsterName' : monsterName,
-                'monsterPath' : monsterPath,
-                'animation' : animReverser(animation),
-                'monsterType' : monsterType
-            }
-            
-            # Open templates and pass through args, then write generated entity to file
-            with open(EternalTraversalTemplate, 'r') as entityTemplate:
-                generatedEntity1 = chevron.render(entityTemplate, args)
-                printEntityToConsole(generatedEntity1) # print generated entity
-                entityTemplate.close()
-            writeStuffToFile(generatedEntity1, output1)
-                       
-            # Do the same for reciprocal traversal, if option was chosen
-            if reciprocalTraversal == "Y" or reciprocalTraversal == "y":
-                with open(EternalTraversalTemplate, 'r') as entityTemplate:
-                    generatedEntity2 = chevron.render(entityTemplate, reciprocalArgs)
-                    entityTemplate.close()
-                printEntityToConsole(generatedEntity2) # print generated entity
-                writeStuffToFile(generatedEntity2, output1)
+        generateDEInfoTraversal(entityNum, startCoords, endCoords, monsterIndices, animIndex, reciprocalTraversal)
         
         entityNum += 1; # increment by 1 after every generated entity
 
         if loopGeneration == False:
             break
+
+def generateDEInfoTraversal(
+    entityNum,
+    startCoords,
+    endCoords,
+    monsterIndices,
+    animIndex,
+    reciprocalTraversal
+    ):
+
+    entityNumStr = str(entityNum).zfill(5) # Leading zeros padding
+
+    for i in range (0 , len(monsterIndices)):
+        monsterIndex = monsterIndices[i]
+    
+        # Determine which animation set to use, based on the monster type
+        if monsterIndex == 14: # arachnotron
+            animSetIndex = 3
+        elif monsterIndex == 15: # wolf
+            animSetIndex = 4
+        elif monsterIndex == 16: # zombie
+            animSetIndex = 5
+        elif monsterIndex >= 17 and monsterIndex <= 22: # baron, hell knight, imp, mancubus, pinky, soldier
+            animSetIndex = 2
+        else: # everything else
+            animSetIndex = 1
+        
+        startCoords[2] -= DEpmNormalViewHeight
+        endCoords[2] -= DEpmNormalViewHeight
+        animation = DEAnimDictionary[animSetIndex][animIndex - 1]
+        monsterName = DEMonsterNameDictionary[monsterIndex]
+        monsterPath = DEMonsterPathDictionary[monsterIndex]
+        monsterType = DEMonsterTypeDictionary[monsterIndex]
+            
+        # args to pass into the template
+        args = {
+            'entityNum': entityNumStr,
+            'startX': startCoords[0],
+            'startY': startCoords[1],
+            'startZ': startCoords[2],
+            'endX': endCoords[0] - startCoords[0],
+            'endY': endCoords[1] - startCoords[1],
+            'endZ': endCoords[2] - startCoords[2],
+            'monsterName' : monsterName,
+            'monsterPath' : monsterPath,
+            'animation' : animation,
+            'monsterType' : monsterType
+        }
+        reciprocalArgs = {
+            'entityNum': entityNumStr + "_r",
+            'startX': endCoords[0],
+            'startY': endCoords[1],
+            'startZ': endCoords[2],
+            'endX': startCoords[0] - endCoords[0],
+            'endY': startCoords[1] - endCoords[1],
+            'endZ': startCoords[2] - endCoords[2],
+            'monsterName' : monsterName,
+            'monsterPath' : monsterPath,
+            'animation' : animReverser(animation),
+            'monsterType' : monsterType
+        }
+        
+        # Open templates and pass through args, then write generated entity to file
+        with open(EternalTraversalTemplate, 'r') as entityTemplate:
+            generatedEntity1 = chevron.render(entityTemplate, args)
+            printEntityToConsole(generatedEntity1) # print generated entity
+            entityTemplate.close()
+        writeStuffToFile(generatedEntity1, output1)
+                   
+        # Do the same for reciprocal traversal, if option was chosen
+        if reciprocalTraversal == "Y" or reciprocalTraversal == "y":
+            with open(EternalTraversalTemplate, 'r') as entityTemplate:
+                generatedEntity2 = chevron.render(entityTemplate, reciprocalArgs)
+                entityTemplate.close()
+            printEntityToConsole(generatedEntity2) # print generated entity
+            writeStuffToFile(generatedEntity2, output1)
 
 # Check if the given animation is up or down, then return the reverse if applicable
 def animReverser(
@@ -260,6 +271,6 @@ def mainBody(
     elif clearSetting == 2:
         clearOutput()
 
-    generateDEInfoTraversal()
+    getInputDEInfoTraversal()
 
 mainBody()
