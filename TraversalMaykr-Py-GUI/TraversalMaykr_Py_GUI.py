@@ -156,19 +156,19 @@ def generateDEInfoTraversal(
         monsterIndex = monsterIndices[i]
     
         # Determine which animation set to use, based on the monster type
-        if monsterIndex == 14: # arachnotron
+        if monsterIndex >= 1 and monsterIndex <= 13: # everything else
+            animSetIndex = 1
+        elif monsterIndex >= 17 and monsterIndex <= 22: # baron, hell knight, imp, mancubus, pinky, soldier
+            animSetIndex = 2
+        elif monsterIndex == 14: # arachnotron
             animSetIndex = 3
         elif monsterIndex == 15: # wolf
             animSetIndex = 4
         elif monsterIndex == 16: # zombie
             animSetIndex = 5
-        elif monsterIndex >= 17 and monsterIndex <= 22: # baron, hell knight, imp, mancubus, pinky, soldier
-            animSetIndex = 2
-        else: # everything else
-            animSetIndex = 1
         
-        startCoords[2] -= DEpmNormalViewHeight
-        endCoords[2] -= DEpmNormalViewHeight
+        startZ = startCoords[2] - DEpmNormalViewHeight
+        endZ = endCoords[2] - DEpmNormalViewHeight
         animation = DEAnimDictionary[animSetIndex][animIndex - 1]
         monsterName = DEMonsterNameDictionary[monsterIndex]
         monsterPath = DEMonsterPathDictionary[monsterIndex]
@@ -179,10 +179,10 @@ def generateDEInfoTraversal(
             'entityNum': entityNumStr,
             'startX': startCoords[0],
             'startY': startCoords[1],
-            'startZ': startCoords[2],
+            'startZ': startZ,
             'endX': endCoords[0] - startCoords[0],
             'endY': endCoords[1] - startCoords[1],
-            'endZ': endCoords[2] - startCoords[2],
+            'endZ': endZ - startZ,
             'monsterName' : monsterName,
             'monsterPath' : monsterPath,
             'animation' : animation,
@@ -192,10 +192,10 @@ def generateDEInfoTraversal(
             'entityNum': entityNumStr + "_r",
             'startX': endCoords[0],
             'startY': endCoords[1],
-            'startZ': endCoords[2],
+            'startZ': endZ,
             'endX': startCoords[0] - endCoords[0],
             'endY': startCoords[1] - endCoords[1],
-            'endZ': startCoords[2] - endCoords[2],
+            'endZ': startZ - endZ,
             'monsterName' : monsterName,
             'monsterPath' : monsterPath,
             'animation' : animReverser(animation),
