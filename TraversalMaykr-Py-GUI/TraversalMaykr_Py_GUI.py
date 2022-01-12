@@ -224,7 +224,7 @@ def consoleInputDETraversalChain(
     ):
 
     isOnCeiling = input("\nIs the midpoint on the ceiling? (Y/N): ")
-    entityNum = int(input("Set entity numbering start value: ")); # # Set number to append at end of entity name
+    entityNum = int(input("Set entity numbering start value: ")); # Set number to append at end of entity name
 
     while True:
         midCoords = []
@@ -356,7 +356,6 @@ def generateDETraversalChain(
                 'animation' : animReverser(DEAnimDictionary[animSetIndex][traversalAnims[midPoints] - 1])
             }
             
-            # Open templates and pass through args for star and end points, then write to file
             with open(DETraversalChainTemplate, 'r') as entityTemplate:
                 entityTemplateOutput = chevron.render(entityTemplate, startEndArgsReverse)
                 printEntityToConsole(entityTemplateOutput) # print generated entity
@@ -370,8 +369,6 @@ def generateDETraversalChain(
                 else:
                     nextPointReverse = f"mod_traversal_chain_{monsterName}_mid_{intToChar(midLetterReverse+1)}_{entityNumStr}_r"
 
-                print(i)
-                # args to pass into the template for the current mid point
                 midArgsReverse = {
                     'entityNum': entityNumStr + "_r",
                     'midCoordX': midCoords[i-1][0],
@@ -469,10 +466,23 @@ def writeStuffToFile(
 
 # Clears the specified output file
 def clearOutput(
-    outputToClear
     ):
 
-    with open(outputToClear, 'w') as outFile:
+    with open(output1, 'w') as outFile:
+        outFile.write("")
+    with open(output2, 'w') as outFile:
+        outFile.write("")
+
+def clearOutputDEInfo(
+    ):
+
+    with open(output1, 'w') as outFile:
+        outFile.write("")
+
+def clearOutputDEChain(
+    ):
+
+    with open(output2, 'w') as outFile:
         outFile.write("")
 
 # Dedicated function for printing generated entities to console
@@ -513,7 +523,7 @@ def mainConsole(
         # Ask user if they want to clear the output file, then clear it if the option was selected
         manualClear = input("\nClear the output files from previous sessions? (Y/N): ");
         if manualClear == 'y' or manualClear == 'Y':
-            clearOutput(output2)
+            clearOutput()
     elif clearSetting == 2:
         clearOutput()
 
@@ -523,38 +533,33 @@ def mainConsole(
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(604, 599)
+        MainWindow.resize(741, 712)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidgetTraversalEntityTypes = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidgetTraversalEntityTypes.setGeometry(QtCore.QRect(0, 0, 621, 591))
+        self.tabWidgetTraversalEntityTypes.setGeometry(QtCore.QRect(0, 0, 741, 711))
         self.tabWidgetTraversalEntityTypes.setObjectName("tabWidgetTraversalEntityTypes")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
-        self.labelMonsterTypeHeader = QtWidgets.QLabel(self.tab)
-        self.labelMonsterTypeHeader.setGeometry(QtCore.QRect(30, 150, 151, 31))
-        self.labelMonsterTypeHeader.setLineWidth(0)
-        self.labelMonsterTypeHeader.setTextFormat(QtCore.Qt.MarkdownText)
-        self.labelMonsterTypeHeader.setObjectName("labelMonsterTypeHeader")
         self.inputEndCoords = QtWidgets.QLineEdit(self.tab)
-        self.inputEndCoords.setGeometry(QtCore.QRect(30, 60, 291, 31))
+        self.inputEndCoords.setGeometry(QtCore.QRect(30, 130, 321, 31))
         self.inputEndCoords.setObjectName("inputEndCoords")
         self.buttonClearCoords = QtWidgets.QPushButton(self.tab)
-        self.buttonClearCoords.setGeometry(QtCore.QRect(30, 100, 111, 31))
+        self.buttonClearCoords.setGeometry(QtCore.QRect(30, 520, 321, 61))
         self.buttonClearCoords.setObjectName("buttonClearCoords")
         self.labelAnimTypeHeader = QtWidgets.QLabel(self.tab)
-        self.labelAnimTypeHeader.setGeometry(QtCore.QRect(380, 150, 151, 31))
+        self.labelAnimTypeHeader.setGeometry(QtCore.QRect(50, 50, 161, 31))
         self.labelAnimTypeHeader.setLineWidth(0)
         self.labelAnimTypeHeader.setTextFormat(QtCore.Qt.MarkdownText)
         self.labelAnimTypeHeader.setObjectName("labelAnimTypeHeader")
         self.selectReciprocalTraversal = QtWidgets.QCheckBox(self.tab)
-        self.selectReciprocalTraversal.setGeometry(QtCore.QRect(320, 480, 151, 31))
+        self.selectReciprocalTraversal.setGeometry(QtCore.QRect(480, 610, 151, 31))
         self.selectReciprocalTraversal.setObjectName("selectReciprocalTraversal")
         self.buttonGenerateTraversal = QtWidgets.QPushButton(self.tab)
-        self.buttonGenerateTraversal.setGeometry(QtCore.QRect(170, 450, 131, 81))
+        self.buttonGenerateTraversal.setGeometry(QtCore.QRect(490, 520, 131, 81))
         self.buttonGenerateTraversal.setObjectName("buttonGenerateTraversal")
         self.groupBoxMonsterSelect = QtWidgets.QGroupBox(self.tab)
-        self.groupBoxMonsterSelect.setGeometry(QtCore.QRect(20, 160, 311, 261))
+        self.groupBoxMonsterSelect.setGeometry(QtCore.QRect(390, 80, 311, 421))
         self.groupBoxMonsterSelect.setTitle("")
         self.groupBoxMonsterSelect.setObjectName("groupBoxMonsterSelect")
         self.demonSelect_15 = QtWidgets.QCheckBox(self.groupBoxMonsterSelect)
@@ -638,32 +643,238 @@ class Ui_MainWindow(object):
         self.demonSelect_11 = QtWidgets.QCheckBox(self.groupBoxMonsterSelect)
         self.demonSelect_11.setGeometry(QtCore.QRect(120, 210, 81, 31))
         self.demonSelect_11.setObjectName("demonSelect_11")
+        self.labelMonsterTypeHeader = QtWidgets.QLabel(self.groupBoxMonsterSelect)
+        self.labelMonsterTypeHeader.setGeometry(QtCore.QRect(10, -10, 151, 31))
+        self.labelMonsterTypeHeader.setLineWidth(0)
+        self.labelMonsterTypeHeader.setTextFormat(QtCore.Qt.MarkdownText)
+        self.labelMonsterTypeHeader.setObjectName("labelMonsterTypeHeader")
+        self.labelMonsterTypePresetInfo = QtWidgets.QLabel(self.groupBoxMonsterSelect)
+        self.labelMonsterTypePresetInfo.setGeometry(QtCore.QRect(10, 250, 171, 31))
+        self.labelMonsterTypePresetInfo.setLineWidth(0)
+        self.labelMonsterTypePresetInfo.setTextFormat(QtCore.Qt.MarkdownText)
+        self.labelMonsterTypePresetInfo.setObjectName("labelMonsterTypePresetInfo")
+        self.radioButtonPresetAInfo = QtWidgets.QRadioButton(self.groupBoxMonsterSelect)
+        self.radioButtonPresetAInfo.setGeometry(QtCore.QRect(20, 360, 261, 17))
+        self.radioButtonPresetAInfo.setObjectName("radioButtonPresetAInfo")
+        self.radioButtonPresetSuperHeavyInfo = QtWidgets.QRadioButton(self.groupBoxMonsterSelect)
+        self.radioButtonPresetSuperHeavyInfo.setGeometry(QtCore.QRect(20, 340, 82, 17))
+        self.radioButtonPresetSuperHeavyInfo.setObjectName("radioButtonPresetSuperHeavyInfo")
+        self.radioButtonPresetFodderInfo = QtWidgets.QRadioButton(self.groupBoxMonsterSelect)
+        self.radioButtonPresetFodderInfo.setGeometry(QtCore.QRect(20, 300, 82, 17))
+        self.radioButtonPresetFodderInfo.setObjectName("radioButtonPresetFodderInfo")
+        self.radioButtonPresetCInfo = QtWidgets.QRadioButton(self.groupBoxMonsterSelect)
+        self.radioButtonPresetCInfo.setGeometry(QtCore.QRect(20, 400, 261, 17))
+        self.radioButtonPresetCInfo.setObjectName("radioButtonPresetCInfo")
+        self.radioButtonPresetHeavyInfo = QtWidgets.QRadioButton(self.groupBoxMonsterSelect)
+        self.radioButtonPresetHeavyInfo.setGeometry(QtCore.QRect(20, 320, 82, 17))
+        self.radioButtonPresetHeavyInfo.setObjectName("radioButtonPresetHeavyInfo")
+        self.radioButtonPresetNoneInfo = QtWidgets.QRadioButton(self.groupBoxMonsterSelect)
+        self.radioButtonPresetNoneInfo.setGeometry(QtCore.QRect(20, 280, 82, 17))
+        self.radioButtonPresetNoneInfo.setObjectName("radioButtonPresetNoneInfo")
+        self.radioButtonPresetBInfo = QtWidgets.QRadioButton(self.groupBoxMonsterSelect)
+        self.radioButtonPresetBInfo.setGeometry(QtCore.QRect(20, 380, 261, 17))
+        self.radioButtonPresetBInfo.setObjectName("radioButtonPresetBInfo")
         self.comboBoxAnimSelect = QtWidgets.QComboBox(self.tab)
-        self.comboBoxAnimSelect.setGeometry(QtCore.QRect(380, 180, 191, 22))
+        self.comboBoxAnimSelect.setGeometry(QtCore.QRect(50, 80, 191, 22))
         self.comboBoxAnimSelect.setMaxVisibleItems(45)
         self.comboBoxAnimSelect.setObjectName("comboBoxAnimSelect")
         self.inputStartCoords = QtWidgets.QLineEdit(self.tab)
-        self.inputStartCoords.setGeometry(QtCore.QRect(30, 20, 291, 31))
+        self.inputStartCoords.setGeometry(QtCore.QRect(30, 20, 321, 31))
         self.inputStartCoords.setObjectName("inputStartCoords")
         self.inputEntityNum = QtWidgets.QLineEdit(self.tab)
-        self.inputEntityNum.setGeometry(QtCore.QRect(340, 20, 81, 31))
+        self.inputEntityNum.setGeometry(QtCore.QRect(390, 20, 121, 31))
         self.inputEntityNum.setObjectName("inputEntityNum")
         self.buttonClearOutput = QtWidgets.QPushButton(self.tab)
-        self.buttonClearOutput.setGeometry(QtCore.QRect(450, 20, 101, 61))
+        self.buttonClearOutput.setGeometry(QtCore.QRect(30, 600, 321, 61))
         self.buttonClearOutput.setObjectName("buttonClearOutput")
         self.tabWidgetTraversalEntityTypes.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
+        self.buttonClearCoordsAndAnims = QtWidgets.QPushButton(self.tab_2)
+        self.buttonClearCoordsAndAnims.setGeometry(QtCore.QRect(30, 520, 321, 61))
+        self.buttonClearCoordsAndAnims.setObjectName("buttonClearCoordsAndAnims")
+        self.inputEndCoordsChain = QtWidgets.QLineEdit(self.tab_2)
+        self.inputEndCoordsChain.setGeometry(QtCore.QRect(30, 460, 321, 31))
+        self.inputEndCoordsChain.setObjectName("inputEndCoordsChain")
+        self.buttonClearOutputChain = QtWidgets.QPushButton(self.tab_2)
+        self.buttonClearOutputChain.setGeometry(QtCore.QRect(30, 600, 321, 61))
+        self.buttonClearOutputChain.setObjectName("buttonClearOutputChain")
+        self.groupBoxMonsterSelect_3 = QtWidgets.QGroupBox(self.tab_2)
+        self.groupBoxMonsterSelect_3.setGeometry(QtCore.QRect(390, 80, 311, 421))
+        self.groupBoxMonsterSelect_3.setTitle("")
+        self.groupBoxMonsterSelect_3.setObjectName("groupBoxMonsterSelect_3")
+        self.demonSelect_15_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_15_Chain.setGeometry(QtCore.QRect(220, 130, 81, 31))
+        self.demonSelect_15_Chain.setObjectName("demonSelect_15_Chain")
+        self.labelMonsterType_Heavy_4 = QtWidgets.QLabel(self.groupBoxMonsterSelect_3)
+        self.labelMonsterType_Heavy_4.setGeometry(QtCore.QRect(120, 10, 41, 31))
+        self.labelMonsterType_Heavy_4.setLineWidth(0)
+        self.labelMonsterType_Heavy_4.setTextFormat(QtCore.Qt.MarkdownText)
+        self.labelMonsterType_Heavy_4.setObjectName("labelMonsterType_Heavy_4")
+        self.demonSelect_18_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_18_Chain.setGeometry(QtCore.QRect(120, 110, 81, 31))
+        self.demonSelect_18_Chain.setObjectName("demonSelect_18_Chain")
+        self.demonSelect_14_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_14_Chain.setGeometry(QtCore.QRect(120, 30, 81, 31))
+        self.demonSelect_14_Chain.setObjectName("demonSelect_14_Chain")
+        self.demonSelect_17_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_17_Chain.setGeometry(QtCore.QRect(220, 50, 81, 31))
+        self.demonSelect_17_Chain.setObjectName("demonSelect_17_Chain")
+        self.demonSelect_12_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_12_Chain.setGeometry(QtCore.QRect(10, 70, 81, 31))
+        self.demonSelect_12_Chain.setObjectName("demonSelect_12_Chain")
+        self.demonSelect_7_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_7_Chain.setGeometry(QtCore.QRect(220, 90, 81, 31))
+        self.demonSelect_7_Chain.setObjectName("demonSelect_7_Chain")
+        self.demonSelect_19_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_19_Chain.setGeometry(QtCore.QRect(10, 50, 81, 31))
+        self.demonSelect_19_Chain.setObjectName("demonSelect_19_Chain")
+        self.demonSelect_9_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_9_Chain.setGeometry(QtCore.QRect(120, 190, 81, 31))
+        self.demonSelect_9_Chain.setObjectName("demonSelect_9_Chain")
+        self.demonSelect_3_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_3_Chain.setGeometry(QtCore.QRect(120, 70, 81, 31))
+        self.demonSelect_3_Chain.setObjectName("demonSelect_3_Chain")
+        self.labelMonsterType_SHeavy_4 = QtWidgets.QLabel(self.groupBoxMonsterSelect_3)
+        self.labelMonsterType_SHeavy_4.setGeometry(QtCore.QRect(220, 10, 71, 31))
+        self.labelMonsterType_SHeavy_4.setLineWidth(0)
+        self.labelMonsterType_SHeavy_4.setTextFormat(QtCore.Qt.MarkdownText)
+        self.labelMonsterType_SHeavy_4.setObjectName("labelMonsterType_SHeavy_4")
+        self.demonSelect_10_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_10_Chain.setGeometry(QtCore.QRect(220, 110, 81, 31))
+        self.demonSelect_10_Chain.setObjectName("demonSelect_10_Chain")
+        self.demonSelect_5_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_5_Chain.setGeometry(QtCore.QRect(120, 90, 81, 31))
+        self.demonSelect_5_Chain.setObjectName("demonSelect_5_Chain")
+        self.demonSelect_21_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_21_Chain.setGeometry(QtCore.QRect(120, 150, 81, 31))
+        self.demonSelect_21_Chain.setObjectName("demonSelect_21_Chain")
+        self.demonSelect_16_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_16_Chain.setGeometry(QtCore.QRect(10, 130, 81, 31))
+        self.demonSelect_16_Chain.setObjectName("demonSelect_16_Chain")
+        self.demonSelect_13_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_13_Chain.setGeometry(QtCore.QRect(10, 90, 91, 31))
+        self.demonSelect_13_Chain.setObjectName("demonSelect_13_Chain")
+        self.demonSelect_8_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_8_Chain.setGeometry(QtCore.QRect(120, 170, 81, 31))
+        self.demonSelect_8_Chain.setObjectName("demonSelect_8_Chain")
+        self.demonSelect_22_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_22_Chain.setGeometry(QtCore.QRect(10, 110, 81, 31))
+        self.demonSelect_22_Chain.setObjectName("demonSelect_22_Chain")
+        self.demonSelect_2_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_2_Chain.setGeometry(QtCore.QRect(120, 50, 81, 31))
+        self.demonSelect_2_Chain.setObjectName("demonSelect_2_Chain")
+        self.demonSelect_1_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_1_Chain.setGeometry(QtCore.QRect(220, 30, 81, 31))
+        self.demonSelect_1_Chain.setObjectName("demonSelect_1_Chain")
+        self.labelMonsterType_Fodder_4 = QtWidgets.QLabel(self.groupBoxMonsterSelect_3)
+        self.labelMonsterType_Fodder_4.setGeometry(QtCore.QRect(10, 10, 41, 31))
+        self.labelMonsterType_Fodder_4.setLineWidth(0)
+        self.labelMonsterType_Fodder_4.setTextFormat(QtCore.Qt.MarkdownText)
+        self.labelMonsterType_Fodder_4.setObjectName("labelMonsterType_Fodder_4")
+        self.demonSelect_20_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_20_Chain.setGeometry(QtCore.QRect(120, 130, 81, 31))
+        self.demonSelect_20_Chain.setObjectName("demonSelect_20_Chain")
+        self.demonSelect_6_Chain_2 = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_6_Chain_2.setGeometry(QtCore.QRect(10, 30, 81, 31))
+        self.demonSelect_6_Chain_2.setObjectName("demonSelect_6_Chain_2")
+        self.demonSelect_4_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_4_Chain.setGeometry(QtCore.QRect(220, 70, 81, 31))
+        self.demonSelect_4_Chain.setObjectName("demonSelect_4_Chain")
+        self.demonSelect_11_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_11_Chain.setGeometry(QtCore.QRect(120, 210, 81, 31))
+        self.demonSelect_11_Chain.setObjectName("demonSelect_11_Chain")
+        self.labelMonsterTypeHeader_3 = QtWidgets.QLabel(self.groupBoxMonsterSelect_3)
+        self.labelMonsterTypeHeader_3.setGeometry(QtCore.QRect(10, -10, 151, 31))
+        self.labelMonsterTypeHeader_3.setLineWidth(0)
+        self.labelMonsterTypeHeader_3.setTextFormat(QtCore.Qt.MarkdownText)
+        self.labelMonsterTypeHeader_3.setObjectName("labelMonsterTypeHeader_3")
+        self.labelMonsterTypePresetChain = QtWidgets.QLabel(self.groupBoxMonsterSelect_3)
+        self.labelMonsterTypePresetChain.setGeometry(QtCore.QRect(10, 250, 171, 31))
+        self.labelMonsterTypePresetChain.setLineWidth(0)
+        self.labelMonsterTypePresetChain.setTextFormat(QtCore.Qt.MarkdownText)
+        self.labelMonsterTypePresetChain.setObjectName("labelMonsterTypePresetChain")
+        self.radioButtonPresetFodderChain = QtWidgets.QRadioButton(self.groupBoxMonsterSelect_3)
+        self.radioButtonPresetFodderChain.setGeometry(QtCore.QRect(20, 300, 82, 17))
+        self.radioButtonPresetFodderChain.setObjectName("radioButtonPresetFodderChain")
+        self.radioButtonPresetHeavyChain = QtWidgets.QRadioButton(self.groupBoxMonsterSelect_3)
+        self.radioButtonPresetHeavyChain.setGeometry(QtCore.QRect(20, 320, 82, 17))
+        self.radioButtonPresetHeavyChain.setObjectName("radioButtonPresetHeavyChain")
+        self.radioButtonPresetSuperHeavyChain = QtWidgets.QRadioButton(self.groupBoxMonsterSelect_3)
+        self.radioButtonPresetSuperHeavyChain.setGeometry(QtCore.QRect(20, 340, 82, 17))
+        self.radioButtonPresetSuperHeavyChain.setObjectName("radioButtonPresetSuperHeavyChain")
+        self.radioButtonPresetNoneChain = QtWidgets.QRadioButton(self.groupBoxMonsterSelect_3)
+        self.radioButtonPresetNoneChain.setGeometry(QtCore.QRect(20, 280, 82, 17))
+        self.radioButtonPresetNoneChain.setObjectName("radioButtonPresetNoneChain")
+        self.radioButtonPresetAChain = QtWidgets.QRadioButton(self.groupBoxMonsterSelect_3)
+        self.radioButtonPresetAChain.setGeometry(QtCore.QRect(20, 360, 261, 17))
+        self.radioButtonPresetAChain.setObjectName("radioButtonPresetAChain")
+        self.radioButtonPresetBChain = QtWidgets.QRadioButton(self.groupBoxMonsterSelect_3)
+        self.radioButtonPresetBChain.setGeometry(QtCore.QRect(20, 380, 261, 17))
+        self.radioButtonPresetBChain.setObjectName("radioButtonPresetBChain")
+        self.radioButtonPresetCChain = QtWidgets.QRadioButton(self.groupBoxMonsterSelect_3)
+        self.radioButtonPresetCChain.setGeometry(QtCore.QRect(20, 400, 261, 17))
+        self.radioButtonPresetCChain.setObjectName("radioButtonPresetCChain")
+        self.inputStartCoordsChain = QtWidgets.QLineEdit(self.tab_2)
+        self.inputStartCoordsChain.setGeometry(QtCore.QRect(30, 20, 321, 31))
+        self.inputStartCoordsChain.setObjectName("inputStartCoordsChain")
+        self.buttonGenerateTraversalChain = QtWidgets.QPushButton(self.tab_2)
+        self.buttonGenerateTraversalChain.setGeometry(QtCore.QRect(490, 520, 131, 81))
+        self.buttonGenerateTraversalChain.setObjectName("buttonGenerateTraversalChain")
+        self.comboBoxAnimSelectStartChain = QtWidgets.QComboBox(self.tab_2)
+        self.comboBoxAnimSelectStartChain.setGeometry(QtCore.QRect(50, 80, 191, 22))
+        self.comboBoxAnimSelectStartChain.setMaxVisibleItems(45)
+        self.comboBoxAnimSelectStartChain.setPlaceholderText("")
+        self.comboBoxAnimSelectStartChain.setObjectName("comboBoxAnimSelectStartChain")
+        self.selectReciprocalTraversalChain = QtWidgets.QCheckBox(self.tab_2)
+        self.selectReciprocalTraversalChain.setGeometry(QtCore.QRect(470, 610, 181, 31))
+        self.selectReciprocalTraversalChain.setObjectName("selectReciprocalTraversalChain")
+        self.inputEntityNumChain = QtWidgets.QLineEdit(self.tab_2)
+        self.inputEntityNumChain.setGeometry(QtCore.QRect(390, 20, 121, 31))
+        self.inputEntityNumChain.setObjectName("inputEntityNumChain")
+        self.inputMidCoordsChain = QtWidgets.QLineEdit(self.tab_2)
+        self.inputMidCoordsChain.setGeometry(QtCore.QRect(30, 130, 321, 31))
+        self.inputMidCoordsChain.setText("")
+        self.inputMidCoordsChain.setObjectName("inputMidCoordsChain")
+        self.labelStartAnimSelect = QtWidgets.QLabel(self.tab_2)
+        self.labelStartAnimSelect.setGeometry(QtCore.QRect(50, 50, 161, 31))
+        self.labelStartAnimSelect.setObjectName("labelStartAnimSelect")
+        self.labelMidAnimSelect = QtWidgets.QLabel(self.tab_2)
+        self.labelMidAnimSelect.setGeometry(QtCore.QRect(50, 160, 221, 31))
+        self.labelMidAnimSelect.setObjectName("labelMidAnimSelect")
+        self.comboBoxAnimSelectStartChain_2 = QtWidgets.QComboBox(self.tab_2)
+        self.comboBoxAnimSelectStartChain_2.setGeometry(QtCore.QRect(50, 190, 191, 22))
+        self.comboBoxAnimSelectStartChain_2.setMaxVisibleItems(45)
+        self.comboBoxAnimSelectStartChain_2.setPlaceholderText("")
+        self.comboBoxAnimSelectStartChain_2.setObjectName("comboBoxAnimSelectStartChain_2")
+        self.pushButton = QtWidgets.QPushButton(self.tab_2)
+        self.pushButton.setGeometry(QtCore.QRect(280, 170, 71, 61))
+        self.pushButton.setObjectName("pushButton")
+        self.labelCurrentMidPoints = QtWidgets.QLabel(self.tab_2)
+        self.labelCurrentMidPoints.setGeometry(QtCore.QRect(50, 210, 91, 31))
+        self.labelCurrentMidPoints.setObjectName("labelCurrentMidPoints")
+        self.listWidgetMidpoints = QtWidgets.QListWidget(self.tab_2)
+        self.listWidgetMidpoints.setGeometry(QtCore.QRect(50, 240, 301, 192))
+        self.listWidgetMidpoints.setObjectName("listWidgetMidpoints")
         self.tabWidgetTraversalEntityTypes.addTab(self.tab_2, "")
-        self.comboBoxAnimSelect.addItems(DEAnimDictionary[1])
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-
-        self.buttonClearOutput.clicked.connect(clearOutput(output1))
-        self.buttonClearCoords.clicked.connect(self.clearCoords)
+        
+        # For DE Info Traversal
+        self.radioButtonPresetNoneInfo.setChecked(True)
+        self.comboBoxAnimSelect.addItems(DEAnimDictionary[1])
+        self.buttonClearOutput.clicked.connect(clearOutputDEInfo)
+        self.buttonClearCoords.clicked.connect(self.clearCoordsDEInfo)
         self.buttonGenerateTraversal.clicked.connect(self.getGUIInputsDEInfoTraversal)
+
+        # For DE Traversal Chain
+        self.radioButtonPresetNoneChain.setChecked(True)
+        self.comboBoxAnimSelectStartChain.addItems(DEAnimDictionary[1])
+        self.comboBoxAnimSelectStartChain_2.addItems(DEAnimDictionary[1])
+        self.buttonClearOutputChain.clicked.connect(clearOutputDEChain)
+        self.buttonClearCoordsAndAnims.clicked.connect(self.clearCoordsDEChain)
 
         self.retranslateUi(MainWindow)
         self.tabWidgetTraversalEntityTypes.setCurrentIndex(0)
@@ -672,10 +883,9 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "TraversalMaykr-Py-GUI v0.1"))
-        self.labelMonsterTypeHeader.setText(_translate("MainWindow", "__**Monster Type Selection**__"))
         self.inputEndCoords.setPlaceholderText(_translate("MainWindow", "Destination Coordiantes"))
-        self.buttonClearCoords.setText(_translate("MainWindow", "Clear coordinates"))
-        self.labelAnimTypeHeader.setText(_translate("MainWindow", "__**Animation Type Selection**__"))
+        self.buttonClearCoords.setText(_translate("MainWindow", "Clear Coordinates"))
+        self.labelAnimTypeHeader.setText(_translate("MainWindow", "Select animation to Destination"))
         self.selectReciprocalTraversal.setText(_translate("MainWindow", "Create reciprocal traversal"))
         self.buttonGenerateTraversal.setText(_translate("MainWindow", "Generate Traversals"))
         self.demonSelect_15.setText(_translate("MainWindow", "Wolf"))
@@ -703,71 +913,147 @@ class Ui_MainWindow(object):
         self.demonSelect_6.setText(_translate("MainWindow", "Gargoyle"))
         self.demonSelect_4.setText(_translate("MainWindow", "Doom Hunter"))
         self.demonSelect_11.setText(_translate("MainWindow", "Whiplash"))
+        self.labelMonsterTypeHeader.setText(_translate("MainWindow", "__**Monster Type Selection**__"))
+        self.labelMonsterTypePresetInfo.setText(_translate("MainWindow", "Presets (Ignores Above Selections)"))
+        self.radioButtonPresetAInfo.setText(_translate("MainWindow", "Fodder + Carcass, Prowler, Whiplash, Marauder"))
+        self.radioButtonPresetSuperHeavyInfo.setText(_translate("MainWindow", "Super Heavy"))
+        self.radioButtonPresetFodderInfo.setText(_translate("MainWindow", "Fodder"))
+        self.radioButtonPresetCInfo.setText(_translate("MainWindow", "All"))
+        self.radioButtonPresetHeavyInfo.setText(_translate("MainWindow", "Heavy"))
+        self.radioButtonPresetNoneInfo.setText(_translate("MainWindow", "None"))
+        self.radioButtonPresetBInfo.setText(_translate("MainWindow", "All sans Tyrant"))
         self.inputStartCoords.setPlaceholderText(_translate("MainWindow", "Start Coordinates"))
-        self.inputEntityNum.setPlaceholderText(_translate("MainWindow", "Entity Number"))
-        self.buttonClearOutput.setText(_translate("MainWindow", "Clear output files"))
+        self.inputEntityNum.setPlaceholderText(_translate("MainWindow", "Starting Entity Number"))
+        self.buttonClearOutput.setText(_translate("MainWindow", "Clear Output File"))
         self.tabWidgetTraversalEntityTypes.setTabText(self.tabWidgetTraversalEntityTypes.indexOf(self.tab), _translate("MainWindow", "Traversal Info"))
+        self.buttonClearCoordsAndAnims.setText(_translate("MainWindow", "Clear Coordinates and Midpoints"))
+        self.inputEndCoordsChain.setPlaceholderText(_translate("MainWindow", "Destination Coordiantes"))
+        self.buttonClearOutputChain.setText(_translate("MainWindow", "Clear Output File"))
+        self.demonSelect_15_Chain.setText(_translate("MainWindow", "Wolf"))
+        self.labelMonsterType_Heavy_4.setText(_translate("MainWindow", "Heavy"))
+        self.demonSelect_18_Chain.setText(_translate("MainWindow", "Hell Knight"))
+        self.demonSelect_14_Chain.setText(_translate("MainWindow", "Arachnotron"))
+        self.demonSelect_17_Chain.setText(_translate("MainWindow", "Baron of Hell"))
+        self.demonSelect_12_Chain.setText(_translate("MainWindow", "Maykr Drone"))
+        self.demonSelect_7_Chain.setText(_translate("MainWindow", "Marauder"))
+        self.demonSelect_19_Chain.setText(_translate("MainWindow", "Imp"))
+        self.demonSelect_9_Chain.setText(_translate("MainWindow", "Revenant"))
+        self.demonSelect_3_Chain.setText(_translate("MainWindow", "Carcass"))
+        self.labelMonsterType_SHeavy_4.setText(_translate("MainWindow", "Super Heavy"))
+        self.demonSelect_10_Chain.setText(_translate("MainWindow", "Tyrant"))
+        self.demonSelect_5_Chain.setText(_translate("MainWindow", "Dread Knight"))
+        self.demonSelect_21_Chain.setText(_translate("MainWindow", "Pinky"))
+        self.demonSelect_16_Chain.setText(_translate("MainWindow", "Zombie"))
+        self.demonSelect_13_Chain.setText(_translate("MainWindow", "Mecha Zombie"))
+        self.demonSelect_8_Chain.setText(_translate("MainWindow", "Prowler"))
+        self.demonSelect_22_Chain.setText(_translate("MainWindow", "Soldier"))
+        self.demonSelect_2_Chain.setText(_translate("MainWindow", "Blood Maykr"))
+        self.demonSelect_1_Chain.setText(_translate("MainWindow", "Archvile"))
+        self.labelMonsterType_Fodder_4.setText(_translate("MainWindow", "Fodder"))
+        self.demonSelect_20_Chain.setText(_translate("MainWindow", "Mancubus"))
+        self.demonSelect_6_Chain_2.setText(_translate("MainWindow", "Gargoyle"))
+        self.demonSelect_4_Chain.setText(_translate("MainWindow", "Doom Hunter"))
+        self.demonSelect_11_Chain.setText(_translate("MainWindow", "Whiplash"))
+        self.labelMonsterTypeHeader_3.setText(_translate("MainWindow", "__**Monster Type Selection**__"))
+        self.labelMonsterTypePresetChain.setText(_translate("MainWindow", "Presets (Ignores Above Selections)"))
+        self.radioButtonPresetFodderChain.setText(_translate("MainWindow", "Fodder"))
+        self.radioButtonPresetHeavyChain.setText(_translate("MainWindow", "Heavy"))
+        self.radioButtonPresetSuperHeavyChain.setText(_translate("MainWindow", "Super Heavy"))
+        self.radioButtonPresetNoneChain.setText(_translate("MainWindow", "None"))
+        self.radioButtonPresetAChain.setText(_translate("MainWindow", "Fodder + Carcass, Prowler, Whiplash, Marauder"))
+        self.radioButtonPresetBChain.setText(_translate("MainWindow", "All sans Tyrant"))
+        self.radioButtonPresetCChain.setText(_translate("MainWindow", "All"))
+        self.inputStartCoordsChain.setPlaceholderText(_translate("MainWindow", "Start Coordinates"))
+        self.buttonGenerateTraversalChain.setText(_translate("MainWindow", "Generate Traversal Chain"))
+        self.selectReciprocalTraversalChain.setText(_translate("MainWindow", "Create reciprocal traversal chain"))
+        self.inputEntityNumChain.setPlaceholderText(_translate("MainWindow", "Starting Entity Number"))
+        self.inputMidCoordsChain.setPlaceholderText(_translate("MainWindow", "Midpoint Coordinates"))
+        self.labelStartAnimSelect.setText(_translate("MainWindow", "Select animation to first midpoint"))
+        self.labelMidAnimSelect.setText(_translate("MainWindow", "Select animation to next midpoint/destination"))
+        self.pushButton.setText(_translate("MainWindow", "Add Midpoint"))
+        self.labelCurrentMidPoints.setText(_translate("MainWindow", "Current Midpoints"))
         self.tabWidgetTraversalEntityTypes.setTabText(self.tabWidgetTraversalEntityTypes.indexOf(self.tab_2), _translate("MainWindow", "Traversal Chain"))
 
-    def clearCoords(
+    def clearCoordsDEInfo(
         self
         ):
         
         self.inputStartCoords.clear()
         self.inputEndCoords.clear()
 
+    def clearCoordsDEChain(
+        self
+        ):
+        
+        self.inputStartCoordsChain.clear()
+        self.inputMidCoordsChain.clear()
+        self.inputEndCoordsChain.clear()
+
     def getMonsterTypesDEInfoTraversal(
         self
         ):
 
         # Incredibly ugly, but it works. PLEASE replace this if possible!!!
-        tempStr = ""
-        if self.demonSelect_1.isChecked():
-	        tempStr += " 1"
-        if self.demonSelect_2.isChecked():
-        	tempStr += " 2"
-        if self.demonSelect_3.isChecked():
-        	tempStr += " 3"
-        if self.demonSelect_4.isChecked():
-        	tempStr += " 4"
-        if self.demonSelect_5.isChecked():
-        	tempStr += " 5"
-        if self.demonSelect_6.isChecked():
-        	tempStr += " 6"
-        if self.demonSelect_7.isChecked():
-        	tempStr += " 7"
-        if self.demonSelect_8.isChecked():
-        	tempStr += " 8"
-        if self.demonSelect_9.isChecked():
-        	tempStr += " 9"
-        if self.demonSelect_10.isChecked():
-        	tempStr += " 10"
-        if self.demonSelect_11.isChecked():
-        	tempStr += " 11"
-        if self.demonSelect_12.isChecked():
-        	tempStr += " 12"
-        if self.demonSelect_13.isChecked():
-        	tempStr += " 13"
-        if self.demonSelect_14.isChecked():
-        	tempStr += " 14"
-        if self.demonSelect_15.isChecked():
-        	tempStr += " 15"
-        if self.demonSelect_16.isChecked():
-        	tempStr += " 16"
-        if self.demonSelect_17.isChecked():
-        	tempStr += " 17"
-        if self.demonSelect_18.isChecked():
-        	tempStr += " 18"
-        if self.demonSelect_19.isChecked():
-        	tempStr += " 19"
-        if self.demonSelect_20.isChecked():
-        	tempStr += " 20"
-        if self.demonSelect_21.isChecked():
-        	tempStr += " 21"
-        if self.demonSelect_22.isChecked():
-        	tempStr += " 22"
+        if self.radioButtonPresetNoneInfo.isChecked():
+            tempStr = ""
+            if self.demonSelect_1.isChecked():
+	            tempStr += " 1"
+            if self.demonSelect_2.isChecked():
+            	tempStr += " 2"
+            if self.demonSelect_3.isChecked():
+            	tempStr += " 3"
+            if self.demonSelect_4.isChecked():
+            	tempStr += " 4"
+            if self.demonSelect_5.isChecked():
+            	tempStr += " 5"
+            if self.demonSelect_6.isChecked():
+            	tempStr += " 6"
+            if self.demonSelect_7.isChecked():
+            	tempStr += " 7"
+            if self.demonSelect_8.isChecked():
+            	tempStr += " 8"
+            if self.demonSelect_9.isChecked():
+            	tempStr += " 9"
+            if self.demonSelect_10.isChecked():
+            	tempStr += " 10"
+            if self.demonSelect_11.isChecked():
+            	tempStr += " 11"
+            if self.demonSelect_12.isChecked():
+            	tempStr += " 12"
+            if self.demonSelect_13.isChecked():
+            	tempStr += " 13"
+            if self.demonSelect_14.isChecked():
+            	tempStr += " 14"
+            if self.demonSelect_15.isChecked():
+            	tempStr += " 15"
+            if self.demonSelect_16.isChecked():
+            	tempStr += " 16"
+            if self.demonSelect_17.isChecked():
+            	tempStr += " 17"
+            if self.demonSelect_18.isChecked():
+            	tempStr += " 18"
+            if self.demonSelect_19.isChecked():
+            	tempStr += " 19"
+            if self.demonSelect_20.isChecked():
+            	tempStr += " 20"
+            if self.demonSelect_21.isChecked():
+            	tempStr += " 21"
+            if self.demonSelect_22.isChecked():
+            	tempStr += " 22"
+            return stringToList(tempStr, 'int')
+        elif self.radioButtonPresetFodderInfo.isChecked(): # Fodder
+                return stringToList(" 6 19 12 13 22 16", 'int')
+        elif self.radioButtonPresetHeavyInfo.isChecked(): # Heavy
+                return stringToList(" 14 2 3 5 18 20 21 8 9 11", 'int')
+        elif self.radioButtonPresetSuperHeavyInfo.isChecked(): # Super Heavy
+                return stringToList(" 1 17 4 7 10 15", 'int')
+        elif self.radioButtonPresetAInfo.isChecked(): # Fodder + Carcass, Prowler, Whiplash, Marauder
+                return stringToList(" 6 19 12 13 22 16 3 8 11 7", 'int')
+        elif self.radioButtonPresetBInfo.isChecked(): # All sans Tyrant
+                return stringToList(" 1 2 3 4 5 6 7 8 9 11 12 13 14 15 16 17 18 19 20 21 22", 'int')
+        elif self.radioButtonPresetCInfo.isChecked(): # All
+                return stringToList(" 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22", 'int')
 
-        return stringToList(tempStr, 'int')
 
     def getGUIInputsDEInfoTraversal(
         self
@@ -786,11 +1072,11 @@ class Ui_MainWindow(object):
 
 # if name main
 if __name__ == "__main__":
-    mainConsole()
-    #import sys
-    #app = QtWidgets.QApplication(sys.argv)
-    #MainWindow = QtWidgets.QMainWindow()
-    #ui = Ui_MainWindow()
-    #ui.setupUi(MainWindow)
-    #MainWindow.show()
-    #sys.exit(app.exec_())
+    #mainConsole()
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
