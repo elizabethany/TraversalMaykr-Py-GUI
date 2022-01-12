@@ -43,4 +43,3 @@ jump_forward_500_up_300
 jump_forward_500_up_500
 jump_forward_1000_down_1000
 jump_forward_1000_up_1000
-# all not listed in other variations

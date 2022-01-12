@@ -18,6 +18,8 @@ output2 = config['Output Files']['output2']
 
 templates = config['Templates']
 EternalTraversalTemplate = templates['EternalTraversal']
+DETraversalChainTemplate = templates['EternalTraversalChainA']
+DETraversalChainMidTemplate = templates['EternalTraversalChainB']
 
 DEpmNormalViewHeight = float(config['Misc.']['Eternalpm_normalViewHeight'])
 D16pmNormalViewHeight = float(config['Misc.']['2016pm_normalViewHeight'])
@@ -125,8 +127,8 @@ def consoleInputDEInfoTraversal(
 
     while True:
         # Get start and end coords
-        startCoords = formatCoords(input("Starting coords: "))
-        endCoords = formatCoords(input("Destination coords: "))
+        startCoords = stringToList(input("Starting coords: "), 'float')
+        endCoords = stringToList(input("Destination coords: "), 'float')
 
         monsterIndices = list(map(int, input("Monster types: ").split()))
         animIndex = int(input("Animation type: "))
@@ -217,6 +219,232 @@ def generateDEInfoTraversal(
             printEntityToConsole(generatedEntity2) # print generated entity
             writeStuffToFile(generatedEntity2, output1)
 
+# Get info needed for Traversal Chain via console
+def consoleInputDETraversalChain(
+    ):
+
+    isOnCeiling = input("\nIs the midpoint on the ceiling? (Y/N): ")
+    entityNum = int(input("Set entity numbering start value: ")); # # Set number to append at end of entity name
+
+    while True:
+        midCoords = []
+        traversalAnims = []
+
+        startCoords = stringToList(input("Start coords: "), 'float')
+        traversalAnims.append(int(input("Animation to next point: ")))
+
+        midPoints = int((input ("Number of mid points: ")))
+        for i in range (0, midPoints):
+            midCoords.append(stringToList(input(f"Mid point {int(i + 1)} coords: "), 'float'))
+            traversalAnims.append(int(input("Animation to next point: ")))
+        
+        endCoords = stringToList(input("End coords: "), 'float')
+
+        monsterIndices = stringToList(input("Monster types: "), 'int')
+        reciprocalTraversal = yesNoToBool(input("Generate reciprocal traversal? (Y/N): "))
+
+        print(traversalAnims)
+
+        generateDETraversalChain(entityNum, startCoords, midCoords, endCoords, isOnCeiling, midPoints, monsterIndices, traversalAnims, reciprocalTraversal)
+        
+        entityNum += 1
+
+        if loopGeneration == False:
+            break
+
+# DE: Generate traversal chains
+def generateDETraversalChain(
+    entityNum,
+    startCoords,
+    midCoords,
+    endCoords,
+    isOnCeiling,
+    midPoints,
+    monsterIndices,
+    traversalAnims,
+    reciprocalTraversal
+    ):
+ 
+    entityNumStr = str(entityNum).zfill(3)
+    
+    if yesNoToBool(isOnCeiling):
+        ceilingCompensation = 0.5;
+    else:
+        ceilingCompensation = 0 - DEpmNormalViewHeight
+    
+    for i in range (0 , len(monsterIndices)):
+        monsterIndex = monsterIndices[i]
+    
+        # Determine which animation set to use, based on the monster type
+        if monsterIndex >= 1 and monsterIndex <= 13: # everything else
+            animSetIndex = 1
+        elif monsterIndex >= 17 and monsterIndex <= 22: # baron, hell knight, imp, mancubus, pinky, soldier
+            animSetIndex = 2
+        elif monsterIndex == 14: # arachnotron
+            animSetIndex = 3
+        elif monsterIndex == 15: # wolf
+            animSetIndex = 4
+        elif monsterIndex == 16: # zombie
+            animSetIndex = 5
+        
+        monsterName = DEMonsterNameDictionary[monsterIndex]
+        monsterPath = DEMonsterPathDictionary[monsterIndex]
+        monsterType = DEMonsterTypeDictionary[monsterIndex]
+
+        # args to pass into the template for the start and end points
+        startEndArgs = {
+            'entityNum': entityNumStr,
+            'startX': startCoords[0],
+            'startY': startCoords[1],
+            'startZ': startCoords[2] - DEpmNormalViewHeight,
+            'endX': endCoords[0],
+            'endY': endCoords[1],
+            'endZ': endCoords[2] - DEpmNormalViewHeight,
+            'monsterName' : monsterName,
+            'monsterType' : monsterType,
+            'animWeb' : monsterPathTruncater(monsterPath),
+            'monsterPathStart' : monsterPath,
+            'animation' : DEAnimDictionary[animSetIndex][traversalAnims[0] - 1] # traversalAnims[0] is the start anim; the contents of DEAnimDictionary start from 0
+        }
+        
+        # Open templates and pass through args for star and end points, then write to file
+        with open(DETraversalChainTemplate, 'r') as entityTemplate:
+            entityTemplateOutput = chevron.render(entityTemplate, startEndArgs)
+            printEntityToConsole(entityTemplateOutput) # print generated entity
+        writeStuffToFile(entityTemplateOutput, output2)
+
+        for i in range (0, midPoints):
+            if i == midPoints - 1:
+                nextPoint = f"mod_traversal_point_{monsterName}_end_{entityNumStr}"
+            else:
+                nextPoint = f"mod_traversal_chain_{monsterName}_mid_{intToChar(i+ 2)}_{entityNumStr}"
+
+            # args to pass into the template for the current mid point
+            midArgs = {
+                'entityNum': entityNumStr,
+                'midCoordX': midCoords[i][0],
+                'midCoordY': midCoords[i][1],
+                'midCoordZ': midCoords[i][2] + ceilingCompensation,
+                'midLetter' : intToChar(i + 1),
+                'monsterName' : monsterName,
+                'monsterType' : monsterType,
+                'animWeb' : monsterPathTruncater(monsterPath),
+                'nextPoint' : nextPoint,
+                'monsterPathMid' : monsterPath,
+                'midAnimation' : DEAnimDictionary[animSetIndex][traversalAnims[i + 1] - 1] # add 1 as traversalAnims[0] is the start anim
+            }
+
+            with open(DETraversalChainMidTemplate, 'r') as entityTemplate:
+                entityTemplateOutput = chevron.render(entityTemplate, midArgs)
+                printEntityToConsole(entityTemplateOutput) # print generated entity
+            writeStuffToFile(entityTemplateOutput, output2)
+
+        # create reciprocal traversal chain if option was selected
+        if reciprocalTraversal:
+            startEndArgsReverse = {
+                'entityNum': entityNumStr + "_r",
+                'startX': endCoords[0],
+                'startY': endCoords[1],
+                'startZ': endCoords[2] - DEpmNormalViewHeight,
+                'endX': startCoords[0],
+                'endY': startCoords[1],
+                'endZ': startCoords[2] - DEpmNormalViewHeight,
+                'monsterName' : monsterName,
+                'monsterType' : monsterType,
+                'animWeb' : monsterPathTruncater(monsterPath),
+                'monsterPathStart' : monsterPath,
+                'animation' : animReverser(DEAnimDictionary[animSetIndex][traversalAnims[midPoints] - 1])
+            }
+            
+            # Open templates and pass through args for star and end points, then write to file
+            with open(DETraversalChainTemplate, 'r') as entityTemplate:
+                entityTemplateOutput = chevron.render(entityTemplate, startEndArgsReverse)
+                printEntityToConsole(entityTemplateOutput) # print generated entity
+            writeStuffToFile(entityTemplateOutput, output2)
+
+            midLetterReverse = int(1)
+
+            for i in range (midPoints, 0, -1):
+                if i == 1:
+                    nextPointReverse = f"mod_traversal_point_{monsterName}_end_{entityNumStr}_r"
+                else:
+                    nextPointReverse = f"mod_traversal_chain_{monsterName}_mid_{intToChar(midLetterReverse+1)}_{entityNumStr}_r"
+
+                print(i)
+                # args to pass into the template for the current mid point
+                midArgsReverse = {
+                    'entityNum': entityNumStr + "_r",
+                    'midCoordX': midCoords[i-1][0],
+                    'midCoordY': midCoords[i-1][1],
+                    'midCoordZ': midCoords[i-1][2] + ceilingCompensation,
+                    'midLetter' : intToChar(midLetterReverse),
+                    'monsterName' : monsterName,
+                    'monsterType' : monsterType,
+                    'animWeb' : monsterPathTruncater(monsterPath),
+                    'nextPoint' : nextPointReverse,
+                    'monsterPathMid' : monsterPath,
+                    'midAnimation' : animReverser(DEAnimDictionary[animSetIndex][traversalAnims[i-1] - 1])
+                }
+
+                with open(DETraversalChainMidTemplate, 'r') as entityTemplate:
+                    entityTemplateOutput = chevron.render(entityTemplate, midArgsReverse)
+                    printEntityToConsole(entityTemplateOutput) # print generated entity
+                writeStuffToFile(entityTemplateOutput, output2)
+
+                midLetterReverse += 1
+
+
+# Removes /traversal or /traversals from the given string
+def monsterPathTruncater(
+    monsterPath
+    ):
+
+    if "/traversal" in monsterPath:
+        return monsterPath.replace("/traversal", "")
+    elif "/traversals" in monsterPath:
+        return monsterPath.replace("/traversals", "")
+
+def intToChar(
+    intInput
+    ):
+
+    return chr(ord('`')+intInput)
+
+# pitch yaw roll to spawnOrientation matrix from Zandy
+def sin_cos(deg):
+    rad = math.radians(float(deg))
+    return math.sin(rad), math.cos(rad)
+
+def angle_to_mat3(
+    x,
+    y,
+    z
+    ): # yaw, pitch, roll
+
+    sy, cy = sin_cos(x)
+    sp, cp = sin_cos(y)
+    sr, cr = sin_cos(z)
+
+    return [
+        cp * cy,
+        cp * sy,
+        -sp,
+        sr * sp * cy + cr * -sy,
+        sr * sp * sy + cr * cy,
+        sr * cp,
+        cr * sp * cy + -sr * sy,
+        cr * sp * sy + -sr * cy,
+        cr * cp,
+    ]
+
+# Function to round the given value to the nearest specified interval
+def roundToInterval(
+    inputValue,
+    interval
+    ):
+    
+    return round (inputValue / interval) * interval
+
 # Check if the given animation is up or down, then return the reverse if applicable
 def animReverser(
     animString
@@ -239,13 +467,12 @@ def writeStuffToFile(
     with open(outputFile, 'a') as output_File:
         output_File.write("\n" + inputItem)
 
-# Clears the output files
+# Clears the specified output file
 def clearOutput(
+    outputToClear
     ):
 
-    with open(output1, 'w') as outFile:
-        outFile.write("")
-    with open(output2, 'w') as outFile:
+    with open(outputToClear, 'w') as outFile:
         outFile.write("")
 
 # Dedicated function for printing generated entities to console
@@ -286,54 +513,48 @@ def mainConsole(
         # Ask user if they want to clear the output file, then clear it if the option was selected
         manualClear = input("\nClear the output files from previous sessions? (Y/N): ");
         if manualClear == 'y' or manualClear == 'Y':
-            clearOutput()
+            clearOutput(output2)
     elif clearSetting == 2:
         clearOutput()
 
-    consoleInputDEInfoTraversal()
+    consoleInputDETraversalChain()
 
-#if __name__ == '__main__':
-#    mainConsole()
-
+# Main Window
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(622, 587)
+        MainWindow.resize(604, 599)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.selectReciprocalTraversal = QtWidgets.QCheckBox(self.centralwidget)
-        self.selectReciprocalTraversal.setGeometry(QtCore.QRect(340, 500, 151, 31))
-        self.selectReciprocalTraversal.setObjectName("selectReciprocalTraversal")
-        self.buttonGenerateTraversal = QtWidgets.QPushButton(self.centralwidget)
-        self.buttonGenerateTraversal.setGeometry(QtCore.QRect(190, 470, 131, 81))
-        self.buttonGenerateTraversal.setObjectName("buttonGenerateTraversal")
-        self.buttonClearOutput = QtWidgets.QPushButton(self.centralwidget)
-        self.buttonClearOutput.setGeometry(QtCore.QRect(470, 40, 101, 61))
-        self.buttonClearOutput.setObjectName("buttonClearOutput")
-        self.inputStartCoords = QtWidgets.QLineEdit(self.centralwidget)
-        self.inputStartCoords.setGeometry(QtCore.QRect(50, 40, 291, 31))
-        self.inputStartCoords.setObjectName("inputStartCoords")
-        self.inputEndCoords = QtWidgets.QLineEdit(self.centralwidget)
-        self.inputEndCoords.setGeometry(QtCore.QRect(50, 80, 291, 31))
+        self.tabWidgetTraversalEntityTypes = QtWidgets.QTabWidget(self.centralwidget)
+        self.tabWidgetTraversalEntityTypes.setGeometry(QtCore.QRect(0, 0, 621, 591))
+        self.tabWidgetTraversalEntityTypes.setObjectName("tabWidgetTraversalEntityTypes")
+        self.tab = QtWidgets.QWidget()
+        self.tab.setObjectName("tab")
+        self.labelMonsterTypeHeader = QtWidgets.QLabel(self.tab)
+        self.labelMonsterTypeHeader.setGeometry(QtCore.QRect(30, 150, 151, 31))
+        self.labelMonsterTypeHeader.setLineWidth(0)
+        self.labelMonsterTypeHeader.setTextFormat(QtCore.Qt.MarkdownText)
+        self.labelMonsterTypeHeader.setObjectName("labelMonsterTypeHeader")
+        self.inputEndCoords = QtWidgets.QLineEdit(self.tab)
+        self.inputEndCoords.setGeometry(QtCore.QRect(30, 60, 291, 31))
         self.inputEndCoords.setObjectName("inputEndCoords")
-        self.inputEntityNum = QtWidgets.QLineEdit(self.centralwidget)
-        self.inputEntityNum.setGeometry(QtCore.QRect(360, 40, 81, 31))
-        self.inputEntityNum.setObjectName("inputEntityNum")
-        self.buttonClearCoords = QtWidgets.QPushButton(self.centralwidget)
-        self.buttonClearCoords.setGeometry(QtCore.QRect(50, 120, 111, 31))
+        self.buttonClearCoords = QtWidgets.QPushButton(self.tab)
+        self.buttonClearCoords.setGeometry(QtCore.QRect(30, 100, 111, 31))
         self.buttonClearCoords.setObjectName("buttonClearCoords")
-        self.comboBoxAnimSelect = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBoxAnimSelect.setGeometry(QtCore.QRect(400, 200, 191, 22))
-        self.comboBoxAnimSelect.setMaxVisibleItems(45)
-        self.comboBoxAnimSelect.setObjectName("comboBoxAnimSelect")
-        self.comboBoxAnimSelect.addItems(DEAnimDictionary[1])
-        self.labelAnimTypeHeader = QtWidgets.QLabel(self.centralwidget)
-        self.labelAnimTypeHeader.setGeometry(QtCore.QRect(400, 170, 151, 31))
+        self.labelAnimTypeHeader = QtWidgets.QLabel(self.tab)
+        self.labelAnimTypeHeader.setGeometry(QtCore.QRect(380, 150, 151, 31))
         self.labelAnimTypeHeader.setLineWidth(0)
         self.labelAnimTypeHeader.setTextFormat(QtCore.Qt.MarkdownText)
         self.labelAnimTypeHeader.setObjectName("labelAnimTypeHeader")
-        self.groupBoxMonsterSelect = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBoxMonsterSelect.setGeometry(QtCore.QRect(40, 180, 311, 261))
+        self.selectReciprocalTraversal = QtWidgets.QCheckBox(self.tab)
+        self.selectReciprocalTraversal.setGeometry(QtCore.QRect(320, 480, 151, 31))
+        self.selectReciprocalTraversal.setObjectName("selectReciprocalTraversal")
+        self.buttonGenerateTraversal = QtWidgets.QPushButton(self.tab)
+        self.buttonGenerateTraversal.setGeometry(QtCore.QRect(170, 450, 131, 81))
+        self.buttonGenerateTraversal.setObjectName("buttonGenerateTraversal")
+        self.groupBoxMonsterSelect = QtWidgets.QGroupBox(self.tab)
+        self.groupBoxMonsterSelect.setGeometry(QtCore.QRect(20, 160, 311, 261))
         self.groupBoxMonsterSelect.setTitle("")
         self.groupBoxMonsterSelect.setObjectName("groupBoxMonsterSelect")
         self.demonSelect_15 = QtWidgets.QCheckBox(self.groupBoxMonsterSelect)
@@ -417,34 +638,46 @@ class Ui_MainWindow(object):
         self.demonSelect_11 = QtWidgets.QCheckBox(self.groupBoxMonsterSelect)
         self.demonSelect_11.setGeometry(QtCore.QRect(120, 210, 81, 31))
         self.demonSelect_11.setObjectName("demonSelect_11")
-        self.labelMonsterTypeHeader = QtWidgets.QLabel(self.centralwidget)
-        self.labelMonsterTypeHeader.setGeometry(QtCore.QRect(50, 170, 151, 31))
-        self.labelMonsterTypeHeader.setLineWidth(0)
-        self.labelMonsterTypeHeader.setTextFormat(QtCore.Qt.MarkdownText)
-        self.labelMonsterTypeHeader.setObjectName("labelMonsterTypeHeader")
+        self.comboBoxAnimSelect = QtWidgets.QComboBox(self.tab)
+        self.comboBoxAnimSelect.setGeometry(QtCore.QRect(380, 180, 191, 22))
+        self.comboBoxAnimSelect.setMaxVisibleItems(45)
+        self.comboBoxAnimSelect.setObjectName("comboBoxAnimSelect")
+        self.inputStartCoords = QtWidgets.QLineEdit(self.tab)
+        self.inputStartCoords.setGeometry(QtCore.QRect(30, 20, 291, 31))
+        self.inputStartCoords.setObjectName("inputStartCoords")
+        self.inputEntityNum = QtWidgets.QLineEdit(self.tab)
+        self.inputEntityNum.setGeometry(QtCore.QRect(340, 20, 81, 31))
+        self.inputEntityNum.setObjectName("inputEntityNum")
+        self.buttonClearOutput = QtWidgets.QPushButton(self.tab)
+        self.buttonClearOutput.setGeometry(QtCore.QRect(450, 20, 101, 61))
+        self.buttonClearOutput.setObjectName("buttonClearOutput")
+        self.tabWidgetTraversalEntityTypes.addTab(self.tab, "")
+        self.tab_2 = QtWidgets.QWidget()
+        self.tab_2.setObjectName("tab_2")
+        self.tabWidgetTraversalEntityTypes.addTab(self.tab_2, "")
+        self.comboBoxAnimSelect.addItems(DEAnimDictionary[1])
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-        self.buttonClearOutput.clicked.connect(clearOutput)
+        self.buttonClearOutput.clicked.connect(clearOutput(output1))
         self.buttonClearCoords.clicked.connect(self.clearCoords)
-        self.buttonGenerateTraversal.clicked.connect(self.getGUIInputs)
+        self.buttonGenerateTraversal.clicked.connect(self.getGUIInputsDEInfoTraversal)
 
         self.retranslateUi(MainWindow)
+        self.tabWidgetTraversalEntityTypes.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "TraversalMaykr-Py-GUI v0.1"))
-        self.selectReciprocalTraversal.setText(_translate("MainWindow", "Create reciprocal traversal"))
-        self.buttonGenerateTraversal.setText(_translate("MainWindow", "Generate Traversals"))
-        self.buttonClearOutput.setText(_translate("MainWindow", "Clear output files"))
-        self.inputStartCoords.setPlaceholderText(_translate("MainWindow", "Start Coordinates"))
+        self.labelMonsterTypeHeader.setText(_translate("MainWindow", "__**Monster Type Selection**__"))
         self.inputEndCoords.setPlaceholderText(_translate("MainWindow", "Destination Coordiantes"))
-        self.inputEntityNum.setPlaceholderText(_translate("MainWindow", "Entity Number"))
         self.buttonClearCoords.setText(_translate("MainWindow", "Clear coordinates"))
         self.labelAnimTypeHeader.setText(_translate("MainWindow", "__**Animation Type Selection**__"))
+        self.selectReciprocalTraversal.setText(_translate("MainWindow", "Create reciprocal traversal"))
+        self.buttonGenerateTraversal.setText(_translate("MainWindow", "Generate Traversals"))
         self.demonSelect_15.setText(_translate("MainWindow", "Wolf"))
         self.labelMonsterType_Heavy.setText(_translate("MainWindow", "Heavy"))
         self.demonSelect_18.setText(_translate("MainWindow", "Hell Knight"))
@@ -470,7 +703,11 @@ class Ui_MainWindow(object):
         self.demonSelect_6.setText(_translate("MainWindow", "Gargoyle"))
         self.demonSelect_4.setText(_translate("MainWindow", "Doom Hunter"))
         self.demonSelect_11.setText(_translate("MainWindow", "Whiplash"))
-        self.labelMonsterTypeHeader.setText(_translate("MainWindow", "__**Monster Type Selection**__"))
+        self.inputStartCoords.setPlaceholderText(_translate("MainWindow", "Start Coordinates"))
+        self.inputEntityNum.setPlaceholderText(_translate("MainWindow", "Entity Number"))
+        self.buttonClearOutput.setText(_translate("MainWindow", "Clear output files"))
+        self.tabWidgetTraversalEntityTypes.setTabText(self.tabWidgetTraversalEntityTypes.indexOf(self.tab), _translate("MainWindow", "Traversal Info"))
+        self.tabWidgetTraversalEntityTypes.setTabText(self.tabWidgetTraversalEntityTypes.indexOf(self.tab_2), _translate("MainWindow", "Traversal Chain"))
 
     def clearCoords(
         self
@@ -479,7 +716,7 @@ class Ui_MainWindow(object):
         self.inputStartCoords.clear()
         self.inputEndCoords.clear()
 
-    def getMonsterTypes(
+    def getMonsterTypesDEInfoTraversal(
         self
         ):
 
@@ -532,14 +769,14 @@ class Ui_MainWindow(object):
 
         return stringToList(tempStr, 'int')
 
-    def getGUIInputs(
+    def getGUIInputsDEInfoTraversal(
         self
         ):
 
         entityNum = int(self.inputEntityNum.text())
         startCoords = stringToList(self.inputStartCoords.text(), 'float')
         endCoords = stringToList(self.inputEndCoords.text(), 'float')
-        monsterIndices = self.getMonsterTypes()
+        monsterIndices = self.getMonsterTypesDEInfoTraversal()
         reciprocalTraversal = bool(self.selectReciprocalTraversal.isChecked())
         animIndex = int(self.comboBoxAnimSelect.currentIndex()) + 1
 
@@ -547,13 +784,13 @@ class Ui_MainWindow(object):
         generateDEInfoTraversal(entityNum, startCoords, endCoords, monsterIndices, animIndex, reciprocalTraversal)
         self.inputEntityNum.setText(str(entityNum + 1))
 
-
+# if name main
 if __name__ == "__main__":
-    #mainConsole()
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+    mainConsole()
+    #import sys
+    #app = QtWidgets.QApplication(sys.argv)
+    #MainWindow = QtWidgets.QMainWindow()
+    #ui = Ui_MainWindow()
+    #ui.setupUi(MainWindow)
+    #MainWindow.show()
+    #sys.exit(app.exec_())
