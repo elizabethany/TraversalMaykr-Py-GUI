@@ -24,6 +24,8 @@ DETraversalChainMidTemplate = templates['EternalTraversalChainB']
 DEpmNormalViewHeight = float(config['Misc.']['Eternalpm_normalViewHeight'])
 D16pmNormalViewHeight = float(config['Misc.']['2016pm_normalViewHeight'])
 
+tempAnimList = []
+
 DEMonsterNameDictionary = {
     1  : "archvile",
     2  : "blood_maykr",
@@ -775,9 +777,9 @@ class Ui_MainWindow(object):
         self.demonSelect_20_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
         self.demonSelect_20_Chain.setGeometry(QtCore.QRect(120, 130, 81, 31))
         self.demonSelect_20_Chain.setObjectName("demonSelect_20_Chain")
-        self.demonSelect_6_Chain_2 = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
-        self.demonSelect_6_Chain_2.setGeometry(QtCore.QRect(10, 30, 81, 31))
-        self.demonSelect_6_Chain_2.setObjectName("demonSelect_6_Chain_2")
+        self.demonSelect_6_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
+        self.demonSelect_6_Chain.setGeometry(QtCore.QRect(10, 30, 81, 31))
+        self.demonSelect_6_Chain.setObjectName("demonSelect_6_Chain")
         self.demonSelect_4_Chain = QtWidgets.QCheckBox(self.groupBoxMonsterSelect_3)
         self.demonSelect_4_Chain.setGeometry(QtCore.QRect(220, 70, 81, 31))
         self.demonSelect_4_Chain.setObjectName("demonSelect_4_Chain")
@@ -847,15 +849,18 @@ class Ui_MainWindow(object):
         self.comboBoxAnimSelectStartChain_2.setMaxVisibleItems(45)
         self.comboBoxAnimSelectStartChain_2.setPlaceholderText("")
         self.comboBoxAnimSelectStartChain_2.setObjectName("comboBoxAnimSelectStartChain_2")
-        self.pushButton = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton.setGeometry(QtCore.QRect(280, 170, 71, 61))
-        self.pushButton.setObjectName("pushButton")
+        self.pushButtonAddMidpoint = QtWidgets.QPushButton(self.tab_2)
+        self.pushButtonAddMidpoint.setGeometry(QtCore.QRect(280, 170, 71, 61))
+        self.pushButtonAddMidpoint.setObjectName("pushButtonAddMidpoint")
         self.labelCurrentMidPoints = QtWidgets.QLabel(self.tab_2)
         self.labelCurrentMidPoints.setGeometry(QtCore.QRect(50, 210, 91, 31))
         self.labelCurrentMidPoints.setObjectName("labelCurrentMidPoints")
         self.listWidgetMidpoints = QtWidgets.QListWidget(self.tab_2)
-        self.listWidgetMidpoints.setGeometry(QtCore.QRect(50, 240, 301, 192))
+        self.listWidgetMidpoints.setGeometry(QtCore.QRect(50, 240, 161, 192))
         self.listWidgetMidpoints.setObjectName("listWidgetMidpoints")
+        self.listWidgetMidAnims = QtWidgets.QListWidget(self.tab_2)
+        self.listWidgetMidAnims.setGeometry(QtCore.QRect(220, 240, 131, 192))
+        self.listWidgetMidAnims.setObjectName("listWidgetMidAnims")
         self.tabWidgetTraversalEntityTypes.addTab(self.tab_2, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -875,6 +880,8 @@ class Ui_MainWindow(object):
         self.comboBoxAnimSelectStartChain_2.addItems(DEAnimDictionary[1])
         self.buttonClearOutputChain.clicked.connect(clearOutputDEChain)
         self.buttonClearCoordsAndAnims.clicked.connect(self.clearCoordsDEChain)
+        self.pushButtonAddMidpoint.clicked.connect(self.addMidPointToList)
+        self.buttonGenerateTraversalChain.clicked.connect(self.getGUIInputsDETraversalChain)
 
         self.retranslateUi(MainWindow)
         self.tabWidgetTraversalEntityTypes.setCurrentIndex(0)
@@ -951,7 +958,7 @@ class Ui_MainWindow(object):
         self.demonSelect_1_Chain.setText(_translate("MainWindow", "Archvile"))
         self.labelMonsterType_Fodder_4.setText(_translate("MainWindow", "Fodder"))
         self.demonSelect_20_Chain.setText(_translate("MainWindow", "Mancubus"))
-        self.demonSelect_6_Chain_2.setText(_translate("MainWindow", "Gargoyle"))
+        self.demonSelect_6_Chain.setText(_translate("MainWindow", "Gargoyle"))
         self.demonSelect_4_Chain.setText(_translate("MainWindow", "Doom Hunter"))
         self.demonSelect_11_Chain.setText(_translate("MainWindow", "Whiplash"))
         self.labelMonsterTypeHeader_3.setText(_translate("MainWindow", "__**Monster Type Selection**__"))
@@ -970,7 +977,7 @@ class Ui_MainWindow(object):
         self.inputMidCoordsChain.setPlaceholderText(_translate("MainWindow", "Midpoint Coordinates"))
         self.labelStartAnimSelect.setText(_translate("MainWindow", "Select animation to first midpoint"))
         self.labelMidAnimSelect.setText(_translate("MainWindow", "Select animation to next midpoint/destination"))
-        self.pushButton.setText(_translate("MainWindow", "Add Midpoint"))
+        self.pushButtonAddMidpoint.setText(_translate("MainWindow", "Add Midpoint"))
         self.labelCurrentMidPoints.setText(_translate("MainWindow", "Current Midpoints"))
         self.tabWidgetTraversalEntityTypes.setTabText(self.tabWidgetTraversalEntityTypes.indexOf(self.tab_2), _translate("MainWindow", "Traversal Chain"))
 
@@ -988,6 +995,9 @@ class Ui_MainWindow(object):
         self.inputStartCoordsChain.clear()
         self.inputMidCoordsChain.clear()
         self.inputEndCoordsChain.clear()
+        self.listWidgetMidpoints.clear()
+        self.listWidgetMidAnims.clear()
+        tempAnimList.clear()
 
     def getMonsterTypesDEInfoTraversal(
         self
@@ -995,65 +1005,128 @@ class Ui_MainWindow(object):
 
         # Incredibly ugly, but it works. PLEASE replace this if possible!!!
         if self.radioButtonPresetNoneInfo.isChecked():
-            tempStr = ""
+            tempList = []
             if self.demonSelect_1.isChecked():
-	            tempStr += " 1"
+            	tempList.append(1)
             if self.demonSelect_2.isChecked():
-            	tempStr += " 2"
+            	tempList.append(2)
             if self.demonSelect_3.isChecked():
-            	tempStr += " 3"
+            	tempList.append(3)
             if self.demonSelect_4.isChecked():
-            	tempStr += " 4"
+            	tempList.append(4)
             if self.demonSelect_5.isChecked():
-            	tempStr += " 5"
+            	tempList.append(5)
             if self.demonSelect_6.isChecked():
-            	tempStr += " 6"
+            	tempList.append(6)
             if self.demonSelect_7.isChecked():
-            	tempStr += " 7"
+            	tempList.append(7)
             if self.demonSelect_8.isChecked():
-            	tempStr += " 8"
+            	tempList.append(8)
             if self.demonSelect_9.isChecked():
-            	tempStr += " 9"
+            	tempList.append(9)
             if self.demonSelect_10.isChecked():
-            	tempStr += " 10"
+            	tempList.append(10)
             if self.demonSelect_11.isChecked():
-            	tempStr += " 11"
+            	tempList.append(11)
             if self.demonSelect_12.isChecked():
-            	tempStr += " 12"
+            	tempList.append(12)
             if self.demonSelect_13.isChecked():
-            	tempStr += " 13"
+            	tempList.append(13)
             if self.demonSelect_14.isChecked():
-            	tempStr += " 14"
+            	tempList.append(14)
             if self.demonSelect_15.isChecked():
-            	tempStr += " 15"
+            	tempList.append(15)
             if self.demonSelect_16.isChecked():
-            	tempStr += " 16"
+            	tempList.append(16)
             if self.demonSelect_17.isChecked():
-            	tempStr += " 17"
+            	tempList.append(17)
             if self.demonSelect_18.isChecked():
-            	tempStr += " 18"
+            	tempList.append(18)
             if self.demonSelect_19.isChecked():
-            	tempStr += " 19"
+            	tempList.append(19)
             if self.demonSelect_20.isChecked():
-            	tempStr += " 20"
+            	tempList.append(20)
             if self.demonSelect_21.isChecked():
-            	tempStr += " 21"
+            	tempList.append(21)
             if self.demonSelect_22.isChecked():
-            	tempStr += " 22"
-            return stringToList(tempStr, 'int')
+            	tempList.append(22)
+            return tempList
         elif self.radioButtonPresetFodderInfo.isChecked(): # Fodder
-                return stringToList(" 6 19 12 13 22 16", 'int')
+                return list([6, 19, 12, 13, 22, 16])
         elif self.radioButtonPresetHeavyInfo.isChecked(): # Heavy
-                return stringToList(" 14 2 3 5 18 20 21 8 9 11", 'int')
+                return list([14, 2, 3, 5, 18, 20, 21, 8, 9, 11])
         elif self.radioButtonPresetSuperHeavyInfo.isChecked(): # Super Heavy
-                return stringToList(" 1 17 4 7 10 15", 'int')
+                return list([1, 17, 4, 7, 10, 15])
         elif self.radioButtonPresetAInfo.isChecked(): # Fodder + Carcass, Prowler, Whiplash, Marauder
-                return stringToList(" 6 19 12 13 22 16 3 8 11 7", 'int')
+                return list([6, 19, 12, 13, 22, 16, 3, 8, 11, 7])
         elif self.radioButtonPresetBInfo.isChecked(): # All sans Tyrant
-                return stringToList(" 1 2 3 4 5 6 7 8 9 11 12 13 14 15 16 17 18 19 20 21 22", 'int')
+                return list([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22])
         elif self.radioButtonPresetCInfo.isChecked(): # All
-                return stringToList(" 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22", 'int')
+                return list([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22])
 
+    def getMonsterTypesDETraversalChain(
+        self
+        ):
+        
+        if self.radioButtonPresetNoneChain.isChecked():
+            tempList = []
+            if self.demonSelect_1_Chain.isChecked():
+            	tempList.append(1)
+            if self.demonSelect_2_Chain.isChecked():
+            	tempList.append(2)
+            if self.demonSelect_3_Chain.isChecked():
+            	tempList.append(3)
+            if self.demonSelect_4_Chain.isChecked():
+            	tempList.append(4)
+            if self.demonSelect_5_Chain.isChecked():
+            	tempList.append(5)
+            if self.demonSelect_6_Chain.isChecked():
+            	tempList.append(6)
+            if self.demonSelect_7_Chain.isChecked():
+            	tempList.append(7)
+            if self.demonSelect_8_Chain.isChecked():
+            	tempList.append(8)
+            if self.demonSelect_9_Chain.isChecked():
+            	tempList.append(9)
+            if self.demonSelect_10_Chain.isChecked():
+            	tempList.append(10)
+            if self.demonSelect_11_Chain.isChecked():
+            	tempList.append(11)
+            if self.demonSelect_12_Chain.isChecked():
+            	tempList.append(12)
+            if self.demonSelect_13_Chain.isChecked():
+            	tempList.append(13)
+            if self.demonSelect_14_Chain.isChecked():
+            	tempList.append(14)
+            if self.demonSelect_15_Chain.isChecked():
+            	tempList.append(15)
+            if self.demonSelect_16_Chain.isChecked():
+            	tempList.append(16)
+            if self.demonSelect_17_Chain.isChecked():
+            	tempList.append(17)
+            if self.demonSelect_18_Chain.isChecked():
+            	tempList.append(18)
+            if self.demonSelect_19_Chain.isChecked():
+            	tempList.append(19)
+            if self.demonSelect_20_Chain.isChecked():
+            	tempList.append(20)
+            if self.demonSelect_21_Chain.isChecked():
+            	tempList.append(21)
+            if self.demonSelect_22_Chain.isChecked():
+            	tempList.append(22)
+            return tempList
+        elif self.radioButtonPresetFodderChain.isChecked(): # Fodder
+                return list([6, 19, 12, 13, 22, 16])
+        elif self.radioButtonPresetHeavyChain.isChecked(): # Heavy
+                return list([14, 2, 3, 5, 18, 20, 21, 8, 9, 11])
+        elif self.radioButtonPresetSuperHeavyChain.isChecked(): # Super Heavy
+                return list([1, 17, 4, 7, 10, 15])
+        elif self.radioButtonPresetAChain.isChecked(): # Fodder + Carcass, Prowler, Whiplash, Marauder
+                return list([6, 19, 12, 13, 22, 16, 3, 8, 11, 7])
+        elif self.radioButtonPresetBChain.isChecked(): # All sans Tyrant
+                return list([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22])
+        elif self.radioButtonPresetCChain.isChecked(): # All
+                return list([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22])
 
     def getGUIInputsDEInfoTraversal(
         self
@@ -1069,6 +1142,40 @@ class Ui_MainWindow(object):
         # entityNum,startCoords,endCoords,monsterIndices,animIndex,reciprocalTraversal
         generateDEInfoTraversal(entityNum, startCoords, endCoords, monsterIndices, animIndex, reciprocalTraversal)
         self.inputEntityNum.setText(str(entityNum + 1))
+
+    def addMidPointToList(
+        self
+        ):
+
+        self.listWidgetMidpoints.addItem(self.inputMidCoordsChain.text())
+        tempAnimList.append(self.comboBoxAnimSelectStartChain_2.currentIndex())
+        self.listWidgetMidAnims.addItem(DEAnimDictionary[1][self.comboBoxAnimSelectStartChain_2.currentIndex()])
+        self.inputMidCoordsChain.clear()
+
+    def getGUIInputsDETraversalChain(
+        self
+        ):
+
+        entityNum = int(self.inputEntityNumChain.text())
+        startCoords = stringToList(self.inputStartCoordsChain.text(), 'float')
+
+        midCoords = []
+        for i in range (self.listWidgetMidpoints.count()):
+            placeHolder = str(self.listWidgetMidpoints.item(i).text())
+            midCoords.append(stringToList(placeHolder, 'float'))
+        
+        endCoords = stringToList(self.inputEndCoordsChain.text(), 'float')
+
+        midPoints = len(tempAnimList)
+        monsterIndices = self.getMonsterTypesDETraversalChain()
+        tempAnimList.insert(0, int(self.comboBoxAnimSelectStartChain.currentIndex()) + 1)
+        reciprocalTraversal = bool(self.selectReciprocalTraversalChain.isChecked())
+
+        generateDETraversalChain(entityNum, startCoords, midCoords, endCoords, False, midPoints, monsterIndices, tempAnimList, reciprocalTraversal)
+        #generateDETraversalChain(entityNum, startCoords, midCoords, endCoords, isOnCeiling, midPoints, monsterIndices, traversalAnims, reciprocalTraversal)
+
+        self.clearCoordsDEChain()
+        self.inputEntityNumChain.setText(str(entityNum + 1))
 
 # if name main
 if __name__ == "__main__":
