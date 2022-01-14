@@ -3,7 +3,7 @@ A Python GUI tool to generate `idInfoTraversal` and `idInfo_TraversalChain` (+ `
 
 ## Usage
 ### General
-I wrote this script based coordinates being gathered using `where`, and then pasting it into the coordinates field. You can still manually enter them, in the format `x y z`, ex. `12 34 56` or `13.12 509.2 87.1123`.
+I wrote this script based on coordinates being gathered using `where`, and then pasting it into the coordinates field. You can still manually enter them, in the format `x y z`, ex. `12 34 56` or `13.12 509.2 87.1123`.
 
 The starting entity number is the number appended to the name of the generated entity. For example, if you set it to 24 and made a traversal info for soldiers, then the generated entity would be named `mod_info_traversal_soldier_00024`. This number automatically increments by 1 after every generated entity.
 
