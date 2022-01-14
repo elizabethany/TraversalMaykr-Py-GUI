@@ -38,3 +38,8 @@ Creates `idInfo_TraversalChain` and `idInfo_TraversalPoint` entities.
     * It will make another set of traversal chains, using the start coords as the destinations & vice versa, reversing the order of midpoints, and also reversing the given animations. The reciprocal entity will have `_r` appended to its name
 9. Then click "Generate Traversal Chains"
     * Clicking this will clear all of the input fields on the left
+	
+## Misc. Notes/Known Issues
+* Clicking "Generate Traversal" with some empty fields causes the program to crash.
+* Wolf Traversals don't work properly outside of ledge up/down & jump forward animations, since it such a limited pool of animations. I'm still working on a way around that.
+* The `[Settings]` section in `config.ini` is mainly for console input/output, which I use for testing before setting up the GUI. These settings should be left as is when using the GUI.
