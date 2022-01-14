@@ -1,14 +1,16 @@
-
-
-
-
 ledge_up_500
-
-
-
-
-
-
+ledge_up_500
+ledge_up_500
+ledge_up_500
+ledge_up_500
+ledge_up_500
+ledge_up_500
+ledge_down_500
+ledge_down_500
+ledge_down_500
+ledge_down_500
+ledge_down_500
+ledge_down_500
 ledge_down_500
 
 
@@ -24,15 +26,13 @@ ledge_down_500
 
 
 
-
-
-
-
-
-
 jump_forward_500
-
-
+jump_forward_500
+jump_forward_500
+jump_forward_500
+jump_forward_500
+jump_forward_500
+jump_forward_500
 
 
 
