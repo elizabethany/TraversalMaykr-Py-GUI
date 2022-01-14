@@ -536,6 +536,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(741, 712)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("praetor_dexterity_on_btP_icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidgetTraversalEntityTypes = QtWidgets.QTabWidget(self.centralwidget)
