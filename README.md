@@ -1,3 +1,5 @@
+This program has now been depreciated in favour of [TraversalMaykr-Cpp-GUI](https://github.com/elizabethany/TraversalMaykr-Cpp-GUI).
+
 # TraversalMaykr-Py-GUI
 A Python GUI tool to generate `idInfoTraversal` and `idInfo_TraversalChain` (+ `idInfo_TraversalPoint`) entities for Doom Eternal. Based on Powerball253's [TraversalMaykr](https://github.com/PowerBall253/TraversalMaykr).
 
